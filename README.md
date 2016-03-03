@@ -43,12 +43,7 @@ express is based on a [Connect](https://github.com/senchalabs/connect)
     * res.format
     * res.redirect
     * res.sendStatus
-    *
-    * res.body
-    * res.files
-    * res.setheaders
-    * res.attachment
-    * res.links
+
  * coockies
     * res.coockies
     * signed coockies
@@ -63,8 +58,8 @@ body-parser
     * .json()
     * .urlencoded
 multer (npm package)
-express.static // only build in middleware
-//todo: create middleware
+                   express.static // only build in middleware
+                   //todo: create middleware
 use new application as middleware
 
 next('route')
@@ -165,7 +160,7 @@ use q for mongo
 
 1. SOCKET.IO AT A HIGH LEVEL
  * Thin wrapper around [WebSockets](http://www.html5rocks.com/en/tutorials/websockets/basics/)
- * Works in tandem with an HTTP Server
+ * Works in tandem with an HTTP Server  
  * Documentation: less than awesome, [wiki is better] (https://github.com/socketio/socket.io) than site
 2. KEY FEATURES
  * Client/Server Push
