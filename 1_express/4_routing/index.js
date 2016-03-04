@@ -15,6 +15,8 @@ app.delete('/', function (req, res) {
 	res.send('DELETE request to homepage');
 });
 
+//next('route')
+
 app.use('/sub-item', subItems);
 
 /******String************/

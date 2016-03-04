@@ -15,7 +15,6 @@ If you have any suggestions or ideas for improvement, please let me know.
  * Alternatives: hapi, restify, geddy, koa
 
 REST
-express is based on a [Connect](https://github.com/senchalabs/connect)
 
 ### Basics
  * Middleware concept
@@ -53,13 +52,14 @@ express is based on a [Connect](https://github.com/senchalabs/connect)
  * Some useful built in middleware (like bodyParser)
  * Useful for preprocessing requests
  * Authentication/Authorization
-parsing request
-body-parser
+ * parsing request
+ * body-parser
     * .json()
     * .urlencoded
+
 multer (npm package)
-                   express.static // only build in middleware
-                   //todo: create middleware
+express.static // only build in middleware
+//todo: create middleware
 use new application as middleware
 
 next('route')
