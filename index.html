@@ -112,6 +112,24 @@
 					<h2>Middleware</h2>
 					<img data-src="img\concept-middleware.png" alt="">
 				</section>
+				<section data-markdown>
+					<h2>Middleware concept</h2>
+					<code class="hljs" data-trim>
+						var express = require('express');
+						var app = express();
+						app.use(bodyParser.json());
+						app.use(function (req, res, next) {
+							console.log('Time:', Date.now());
+							next();
+						});
+						app.get('/user', function(req, res) {
+							res.send('hello user');
+						});
+						app.listen(3000, function () {
+							console.log('Example app listening on port 3000!');
+						});
+					</code>
+				</section>
 				<section>
 					<h2>Routing</h2>
 					<ul>
@@ -121,30 +139,97 @@
 						<li>Routing filter types</li>
 					</ul>
 				</section>
-				<section>
+				<section data-markdown>
+					<h2>Routing</h2>
+					<code class="hljs" data-trim>
+						app.get('/', function (req, res) {});
+						app.post('/:id', function (req, res) {});
+
+						var express = require('express');
+						var router = express.Router();
+						router.put(/\/abc|\/xyz/, function (req, res) {}});
+						router.delete(['/', '/:id'], function (req, res) {});
+					</code>
+				</section>
+				<section data-markdown>
 					<h2>Templating</h2>
+					<code class="hljs" data-trim>
+						app.set('view engine', 'ejs');
+						app.locals.title = 'My App';
+						app.get('/', function (req, res) {
+							res.locals.someText = 'test';
+							res.render('test', { message: 'Hello there!'});;
+						});
+					</code>
 				</section>
 			</section>
 			<section>
-				<section>
+<section>
 					<h2>MongoDB Basics</h2>
 					<ul>
 						<li>DataBase</li>
 						<li>Collection</li>
 						<li>Document</li>
 						<li>Field</li>
-						<li><a href="https://docs.mongodb.org/manual/indexes/">Index</a></li>
-						<li>Cursor</li>
 					</ul>
 				</section>
-				<section>
-					<h2>Working with mongo</h2>
-					<ul>
-						<li>Find</li>
-						<li>Insert, Update, Delete</li>
-						<li><a href="https://docs.mongodb.org/manual/reference/operator/aggregation/">Aggregation Pipeline</a></li>
-						<li>Map reduce</li>
-					</ul>
+				<section data-markdown>
+					<h2>Create</h2>
+					<code class="hljs" data-trim>
+					db.unicorns
+						.insert({
+							name: 'Aurora', 
+							dob: new Date(1992,2,13,7,47), 
+							loves: ['carrot','papaya'], 
+							weight: 600, 
+							gender: 'm', 
+							vampires: 63
+						});
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>Find</h2>
+					<code class="hljs" data-trim>
+						db.unicorns.find({gender: 'm', weight: {$gt: 700}})
+						db.unicorns.find({gender: {$ne: 'f'}, weight: {$gte: 701}})
+						//$lt, $lte, $gt, $gte, $ne, $or
+						db.unicorns.find({
+							gender: 'f', 
+							$or: [
+								{loves: 'apple'}, 
+								{loves: 'orange'}, 
+								{weight: {$lt: 500}}
+							]})
+						//Projection
+						db.unicorns.find({vampires: {$exists: false}}, { name:1, _id: 0})
+							.skip(2)
+							.limit(5)
+							.sort({name:1})
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>update</h2>
+					<code class="hljs" data-trim>
+						db.unicorns.insert({})
+						db.unicorns.insert([{}, {}])
+						db.unicorns.update(
+							{gender: 'm'},// selector
+							{
+								$set: {loves: "grape"},
+								$currentDate: {dob: true}
+							},//update
+							{
+								multi: true,
+								upsert: true
+							}
+						)
+						// remove all
+						db.unicorns.remove({})
+						// remove match condition
+						db.unicorns.remove({type: "food"})
+						// remove match condition only one
+						db.unicorns.remove({type: "food"}, 1)
+					</code>
 				</section>
 				<section>
 					<h2>ORM-way: Mongoose</h2>
@@ -152,10 +237,100 @@
 						<li>SCHEMA</li>
 						<li>MODEL</li>
 						<li>Fields types</li>
-						<li>Validation</li>
-						<li>Methods</li>
-						<li>Virtual property</li>
 					</ul>
+				</section>
+				<section data-markdown>
+					<h2>Connection</h2>
+					<code class="hljs" data-trim>
+						var mongoose = require('mongoose');
+						mongoose.connect('mongodb://localhost/test');
+						var db = mongoose.connection;
+						mongoose.Promise = require('q').Promise;
+						db.on('error', function(err) {
+							console.error('connection error:', err));
+						});
+						db.once('open', function (callback) {
+							console.log('connected');
+						});
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>MODEL</h2>
+					<code class="hljs" data-trim>
+						var mongoose = require('mongoose');
+						var Schema = mongoose.Schema;
+						var RolesSchema = new Schema({
+							role: {
+								type: String,
+								required: true
+							},
+							date: {type: Date, default: Date.now},
+							members: [{ type: String }]
+						}, {collection: 'roles'});
+						module.exports = mongoose.model('Roles', RolesSchema);
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>MODEL</h2>
+					<code class="hljs" data-trim>
+						RolesSchema.methods.findAllMembersRoles = function () {
+							return this.model('Roles').find({members: this.members});
+						}
+						RolesSchema.statics.findByName = function (name) {
+							return this.find({role: new RegExp(name, 'i')});
+						}
+						RolesSchema.virtual('membersAll')
+							.get(function () {
+								return this.members.join(',');
+							})
+							.set(function (members) {
+								var membersArray = members.split(',');
+								this.members = membersArray;
+							});
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>Work with model: Save</h2>
+					<code class="hljs" data-trim>
+						var newModel = new model({
+							role: 'dev',
+							members: ['user1', 'user3']
+						});
+
+						newModel.save(function (err) {
+							if (err) return handleError(err);
+							saved!
+						});
+						newModel.save()
+							.then()
+							.catch()
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>Work with model: Find</h2>
+					<code class="hljs" data-trim>
+						model.find({role: 'dev'})
+							.skip(skip)
+							.limit(limit)
+						
+						model.findById(id)
+							.then(function (modelInstance) {
+								var updatedInstance = _.extend(modelInstance, req.body);
+								return updatedInstance.save();
+							})
+					</code>
+				</section>
+				<section data-markdown>
+					<h2>Work with model: Find</h2>
+					<code class="hljs" data-trim>
+						model.remove({role: 'dev'})
+
+						model.update({
+								role: 'dev'
+							}, {
+								$set: {members: ['user2']}
+							})
+					</code>
 				</section>
 			</section>
 			<section>
